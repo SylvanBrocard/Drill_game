@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+from prospect import Prospect
+
 class Vizualizer():
     '''Classe du vizualiser afin de voir des graphiques de performances'''
     #prospect_perf matrice 
@@ -18,6 +20,10 @@ class Vizualizer():
 
 
     def graph_2D(self):
+        pass
+
+    def get_cumulative_average(self, prospect:Prospect) -> float:
+        return np.cumsum([reward for _, reward in prospect.rewards]) / np.arange(1, len(prospect.rewards) + 1)
 
 np.matrice = [[1,2,3],[2,5,4]]
 viz = Vizualizer(matrice)

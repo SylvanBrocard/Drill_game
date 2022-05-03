@@ -20,10 +20,7 @@ class Prospect(ABC):
             self.prospect_once()
 
     def get_total_reward(self) -> int:
-        return sum(self.rewards)
-
-    def get_cumulative_average(self) -> float:
-        return np.cumsum(self.rewards) / np.arange(1, len(self.rewards) + 1)
+        return sum([reward for _, reward in self.rewards])
 
 class UniformProspect(Prospect):
     def prospect_once(self) -> None:
