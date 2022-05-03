@@ -59,7 +59,6 @@ class EGreedyProspect(Prospect):
 
 class SoftmaxProspect(Prospect):
     """Prospecting agent with a softmax policy"""
-    # TODO: random choice!
 
     def __init__(self, tau: float = 1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -68,7 +67,7 @@ class SoftmaxProspect(Prospect):
     def decide_next_coordinates(self) -> Tuple[int, int]:
         probs = np.exp(self.knowledge / self.tau)
         probs /= np.sum(probs)
-        return self.rng.choice(np.transpose(np.nonzero(probs == np.max(probs))))
+        return self.rng.choice(list(np.ndindex(probs.shape)), p=probs.flatten())
 
 
 class UCB1Prospect(Prospect):
@@ -98,4 +97,7 @@ class UCB1Prospect(Prospect):
                 where=self.trials_count > 0,
             )
         )
-        return self.rng.choice(np.transpose(np.nonzero(probs == np.max(probs))))
+        if np.sum(probs) == 0:
+            return self.terrain.get_random_coordinate()
+        probs /= np.sum(probs)
+        return self.rng.choice(list(np.ndindex(probs.shape)), p=probs.flatten())
