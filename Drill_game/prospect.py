@@ -30,11 +30,21 @@ class Prospect(ABC):
         return sum([reward for _, reward in self.rewards])
 
 class UniformProspect(Prospect):
-    def decide_next_coordinates(self) -> None:
+    def decide_next_coordinates(self) -> Tuple[int, int]:
         return self.terrain.get_random_coordinate()
 
 class EGreedyProspect(Prospect):
-    pass
+    def __init__(self, epsilon:float=0.1, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.epsilon = epsilon
+        self.rng = np.random.default_rng()
+
+    def decide_next_coordinates(self) -> Tuple[int, int]:
+        exploit = self.rng.random() < self.epsilon
+        if exploit:
+            return self.rng.choice(np.nonzero(self.knowledge == np.max(self.knowledge)))
+        else:
+            return self.terrain.get_random_coordinate()
 
 class UCB1Prospect(Prospect):
     pass
