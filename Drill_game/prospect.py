@@ -22,6 +22,9 @@ class Prospect(ABC):
     def get_total_reward(self) -> int:
         return sum(self.rewards)
 
+    def get_cumulative_average(self) -> float:
+        return np.cumsum(self.rewards) / np.arange(1, len(self.rewards) + 1)
+
 class UniformProspect(Prospect):
     def prospect_once(self) -> None:
         x, y = self.terrain.get_random_coordinate()
