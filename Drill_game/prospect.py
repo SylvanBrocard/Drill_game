@@ -5,8 +5,9 @@ import numpy as np
 
 from terrain import Terrain
 
+
 class Prospect(ABC):
-    def __init__(self, trials:int, terrain:Terrain, random_seed=None) -> None:
+    def __init__(self, trials: int, terrain: Terrain, random_seed=None) -> None:
         super().__init__()
         self.trials = trials
         self.rewards = []
@@ -19,9 +20,9 @@ class Prospect(ABC):
 
     def prospect_once(self) -> None:
         x, y = self.decide_next_coordinates()
-        self.rewards.append(((x,y),self.terrain.get_reward(x,y)))
-        tile_draws = [reward for loc, reward in self.rewards if loc == (x,y)]
-        self.knowledge[x,y] = mean(tile_draws)
+        self.rewards.append(((x, y), self.terrain.get_reward(x, y)))
+        tile_draws = [reward for loc, reward in self.rewards if loc == (x, y)]
+        self.knowledge[x, y] = mean(tile_draws)
 
     def prospect(self) -> None:
         for _ in range(self.trials):
@@ -30,27 +31,35 @@ class Prospect(ABC):
     def get_total_reward(self) -> int:
         return sum([reward for _, reward in self.rewards])
 
+
 class UniformProspect(Prospect):
     """Prospecting agent with a uniform policy"""
+
     def decide_next_coordinates(self) -> Tuple[int, int]:
         return self.terrain.get_random_coordinate()
 
+
 class EGreedyProspect(Prospect):
     """Prospecting agent with an e-greedy policy"""
-    def __init__(self, epsilon:float=0.1, *args, **kwargs) -> None:
+
+    def __init__(self, epsilon: float = 0.1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.epsilon = epsilon
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
         exploit = self.rng.random() >= self.epsilon
         if exploit:
-            return self.rng.choice(np.transpose(np.nonzero(self.knowledge == np.max(self.knowledge))))
+            return self.rng.choice(
+                np.transpose(np.nonzero(self.knowledge == np.max(self.knowledge)))
+            )
         else:
             return self.terrain.get_random_coordinate()
 
+
 class SoftmaxProspect(Prospect):
     """Prospecting agent with a softmax policy"""
-    def __init__(self, tau:float=1, *args, **kwargs) -> None:
+
+    def __init__(self, tau: float = 1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.temperature = tau
 
@@ -59,20 +68,31 @@ class SoftmaxProspect(Prospect):
         probs /= np.sum(probs)
         return self.rng.choice(np.transpose(np.nonzero(probs == np.max(probs))))
 
+
 class UCB1Prospect(Prospect):
     """Prospecting agent with a UCB1 policy"""
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.trials_count = np.zeros_like(self.terrain.grid)
 
     def prospect_once(self) -> None:
         x, y = self.decide_next_coordinates()
-        self.rewards.append(((x,y),self.terrain.get_reward(x,y)))
-        tile_draws = [reward for loc, reward in self.rewards if loc == (x,y)]
-        self.knowledge[x,y] = mean(tile_draws)
-        self.trials_count[x,y] += 1
+        self.rewards.append(((x, y), self.terrain.get_reward(x, y)))
+        tile_draws = [reward for loc, reward in self.rewards if loc == (x, y)]
+        self.knowledge[x, y] = mean(tile_draws)
+        self.trials_count[x, y] += 1
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
         n = len(self.rewards)
-        probs = self.knowledge + np.sqrt(2 * np.log(n) / self.trials_count)
+        if not n:
+            return self.terrain.get_random_coordinate()
+        probs = self.knowledge + np.sqrt(
+            np.divide(
+                2 * np.log(n),
+                self.trials_count,
+                out=np.zeros_like(self.trials_count),
+                where=self.trials_count > 0,
+            )
+        )
         return self.rng.choice(np.transpose(np.nonzero(probs == np.max(probs))))

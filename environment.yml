@@ -13,3 +13,4 @@ dependencies:
   - ipykernel
   - nbdime
   - ipython_genutils
+  - black
