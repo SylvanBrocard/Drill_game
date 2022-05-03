@@ -21,12 +21,15 @@ class Vizualizer():
 
 
     def graph_2D(self, prospect:Prospect) -> None:
-        plt.figure()
-        plt.plot(self.get_cumulative_average(prospect))
-        plt.show()
+        plt.plot(self.get_cumulative_sum(prospect))
+        plt.grid()
 
     def get_cumulative_average(self, prospect:Prospect) -> float:
         return np.cumsum([reward for _, reward in prospect.rewards]) / np.arange(1, len(prospect.rewards) + 1)
+
+    
+    def get_cumulative_sum(self, prospect:Prospect) -> float:
+        return np.cumsum([reward for _, reward in prospect.rewards])
 
 
 if __name__ == '__main__':

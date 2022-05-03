@@ -2,6 +2,7 @@ from abc import ABC
 from statistics import mean
 from typing import Tuple
 import numpy as np
+from tqdm import tqdm
 
 from terrain import Terrain
 
@@ -25,7 +26,7 @@ class Prospect(ABC):
         self.knowledge[x, y] = mean(tile_draws)
 
     def prospect(self) -> None:
-        for _ in range(self.trials):
+        for _ in tqdm(range(self.trials), desc=self.__class__.__name__):
             self.prospect_once()
 
     def get_total_reward(self) -> int:
@@ -61,10 +62,10 @@ class SoftmaxProspect(Prospect):
 
     def __init__(self, tau: float = 1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.temperature = tau
+        self.tau = tau
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
-        probs = np.exp(self.knowledge / self.temperature)
+        probs = np.exp(self.knowledge / self.tau)
         probs /= np.sum(probs)
         return self.rng.choice(np.transpose(np.nonzero(probs == np.max(probs))))
 

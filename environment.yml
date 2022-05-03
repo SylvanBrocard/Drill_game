@@ -14,3 +14,4 @@ dependencies:
   - nbdime
   - ipython_genutils
   - black
+  - tqdm
