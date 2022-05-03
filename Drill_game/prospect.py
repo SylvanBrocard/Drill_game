@@ -12,6 +12,7 @@ class Prospect(ABC):
         self.rewards = []
         self.terrain = terrain
         self.knowledge = np.zeros_like(terrain.grid)
+        self.rng = np.random.default_rng()
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
         pass
@@ -39,7 +40,6 @@ class EGreedyProspect(Prospect):
     def __init__(self, epsilon:float=0.1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.epsilon = epsilon
-        self.rng = np.random.default_rng()
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
         exploit = self.rng.random() < self.epsilon
@@ -53,7 +53,6 @@ class SoftmaxProspect(Prospect):
     def __init__(self, tau:float=1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.temperature = tau
-        self.rng = np.random.default_rng()
 
     def decide_next_coordinates(self) -> Tuple[int, int]:
         probs = np.exp(self.knowledge / self.temperature)
@@ -61,4 +60,8 @@ class SoftmaxProspect(Prospect):
         return self.rng.choice(np.nonzero(probs == np.max(probs)))
 
 class UCB1Prospect(Prospect):
-    pass
+    """Prospecting agent with a UCB1 policy"""
+    def decide_next_coordinates(self) -> Tuple[int, int]:
+        probs = self.knowledge + np.sqrt(2 * np.log(self.trials) / self.knowledge)
+        probs /= np.sum(probs)
+        return self.rng.choice(np.nonzero(probs == np.max(probs)))
