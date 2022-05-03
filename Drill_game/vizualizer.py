@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from terrain import DiscreteTerrain
+
+from prospect import Prospect, UniformProspect, EGreedyProspect, SoftmaxProspect
 
 class Vizualizer():
     '''Classe du vizualiser afin de voir des graphiques de performances'''
@@ -31,3 +34,25 @@ class Vizualizer():
         fig.colorbar(surf, shrink=0.5, aspect=5)
 
         plt.show()
+    def graph_2D(self, prospect:Prospect) -> None:
+        plt.figure()
+        plt.plot(self.get_cumulative_average(prospect))
+        plt.show()
+
+    def get_cumulative_average(self, prospect:Prospect) -> float:
+        return np.cumsum([reward for _, reward in prospect.rewards]) / np.arange(1, len(prospect.rewards) + 1)
+
+
+if __name__ == '__main__':
+    # matrice = np.array([[1,2,3],[2,5,4]])
+    # viz = Vizualizer(matrice)
+
+    # viz.graph_3d
+
+    terrain = DiscreteTerrain(10, 10)
+
+    for prospect_class in [UniformProspect, EGreedyProspect, SoftmaxProspect]:
+        prospect = prospect_class(trials=100, terrain=terrain)
+        prospect.prospect()
+        viz = Vizualizer(prospect.knowledge)
+        viz.graph_2D(prospect)

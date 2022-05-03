@@ -9,3 +9,8 @@ channels:
 dependencies:
   - python
   - scipy
+  - matplotlib
+  - ipykernel
+  - nbdime
+  - ipython_genutils
+  - black
