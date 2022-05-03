@@ -59,6 +59,7 @@ class EGreedyProspect(Prospect):
 
 class SoftmaxProspect(Prospect):
     """Prospecting agent with a softmax policy"""
+    # TODO: random choice!
 
     def __init__(self, tau: float = 1, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -72,6 +73,7 @@ class SoftmaxProspect(Prospect):
 
 class UCB1Prospect(Prospect):
     """Prospecting agent with a UCB1 policy"""
+    # TODO: random choice!
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
