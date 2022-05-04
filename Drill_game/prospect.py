@@ -72,7 +72,7 @@ class SoftmaxProspect(Prospect):
 
 class UCB1Prospect(Prospect):
     """Prospecting agent with a UCB1 policy"""
-    # TODO: random choice!
+    # TODO: handle tiles that haven't been prospected
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
